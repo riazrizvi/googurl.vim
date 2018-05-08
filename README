@@ -1,6 +1,7 @@
 Google URL Shortener for Vim
 
-Usage (with cursor positioned on url):
+Usage (with cursor positioned on url), takes the string from the cursor upto the next whitespace (or the end of line) and runs google url shortener, with the following shortcut:
+
     <leader>gu
 
 To use with API key put the following line in your .vimrc:
