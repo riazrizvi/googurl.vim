@@ -1,19 +1,16 @@
-if !has('python')
-    echo 'Error: +python required'
-    finish
-endif
 if !exists('g:googurl_api_key')
     let g:googurl_api_key = ''
 endif
 
-map <leader>gu :python googurl()<CR>
+map <leader>gu :py3 googurl()<CR>
 
-python << EOF
+python3 << EOF
 import vim
 import re
 import json
 import urllib
-import urllib2
+from urllib.request import urlopen,Request
+import ssl
 
 def googurl():
     """
@@ -31,16 +28,17 @@ def googurl():
     row = vim.current.window.cursor[0]
     api_url = 'https://www.googleapis.com/urlshortener/v1/url'
     if longurl:
-        data = json.dumps({'longUrl':longurl})
+        data = json.dumps({'longUrl':longurl}).encode('utf-8')
         if vim.eval('g:googurl_api_key'):
             api_url += '?key='+vim.eval('g:googurl_api_key')
-        req = urllib2.Request(api_url, data, {'Content-Type':'application/json'})
-        res = urllib2.urlopen(req)
+        req = Request(api_url, data, {'Content-Type':'application/json'})
+        scontext=ssl.SSLContext(ssl.PROTOCOL_TLS)
+        res = urlopen(req,context=scontext)
         new_data = json.loads(res.read())
         if 'id' in new_data:
             short_url = new_data['id']
             vim.current.buffer[crow-1]= line[:ccol] + short_url + afterurl
     else:
-        print 'no url'
+        print ('no url')
 
 EOF
